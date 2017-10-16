@@ -18,36 +18,50 @@ app.get('/party', (req,res)=>{
 })
 
 //respond with a specific character
-app.get('/party/:id', (req,res)=>{
+app.get('/party/:id', (req, res, next)=>{
   const id = Number(req.params.id)
   const result = party.find(partier => partier.id === id)
   //const result = party.filter(partier => partier.id === id)[0]
   //const [result] = party.filter(partier => partier.id === id)
   //res.json(partier[0])
+  if(result === undefined) return next({message: 'I did not find it!'})
+
   res.json({result})
 })
 
 //this function is a middleware
-app.get('/ping', (req, res)=>{
+app.get('/ping', (req, res) => {
   res.json({message: 'pong!'})
 })
 
-app.get('/hello', (req, res)=>{
+app.get('/hello', (req, res) => {
   res.json({message: 'hello'})
 })
 
-app.get('/hello/friend', (req, res)=>{
+app.get('/hello/friend', (req, res) => {
   res.json({message: `Hi there friend`})
 })
 
-app.use((req, res, next)=>{
+//middleware has three arguments
+app.use((req, res, next) => {
   console.log("I'm middleware!")
   next()
 })
 
-app.get('/hello/:name', (req, res)=>{
+app.get('/hello/:name', (req, res, next) => {
   console.log(req.params.name)
   res.json({message: `Hello ${req.params.name}!`})
+})
+
+app.get('/oups', (req, res) => {
+  throw Error('Message here')
+  res.json({message: 'shite'})
+})
+
+//error handler has four arguments. It's used for 500 series errors
+app.use((err,req,res,next) => {
+  console.log(err);
+  res.status(500).json({error: err})
 })
 
 app.use((req,res) => {
